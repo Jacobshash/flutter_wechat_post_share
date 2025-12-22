@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import '../utils/constant.dart';
+import '../const/constant.dart';
+import '../widgets/Gallery.dart';
 
 class PostEditPage extends StatefulWidget {
   const PostEditPage({super.key});
@@ -45,8 +46,11 @@ class _PostEditPageState extends State<PostEditPage> {
             maxAssets: maxAssets,
           ),
         );
+        if(result==null) {
+          return;
+        }
         setState(() {
-          photos = result ?? [];
+          photos = result;
         });
       },
       child: Container(
@@ -58,16 +62,26 @@ class _PostEditPageState extends State<PostEditPage> {
     );
   }
 
-  Container photoViewContainer(AssetEntity value, double width) {
-    return Container(
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-      child: AssetEntityImage(
-        value,
-        key: ValueKey(value.id), // 添加key参数
-        fit: BoxFit.cover,
-        width: width,
-        height: width,
+  GestureDetector photoViewContainer(AssetEntity asset, double width) {
+    return GestureDetector(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (context){
+          return GalleryWidget(initialIndex: photos.indexOf(asset), items: photos);
+        }));
+
+      },
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+        child: AssetEntityImage(
+          asset,
+          key: ValueKey(asset.id),
+          // 添加key参数
+          fit: BoxFit.cover,
+          width: width,
+          height: width,
+          isOriginal: false,
+        ),
       ),
     );
   }
@@ -82,9 +96,7 @@ class _PostEditPageState extends State<PostEditPage> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.deepPurple,
-        title: Container(
-          child: Text('发布', style: TextStyle(color: Colors.white)),
-        ),
+        title: Text('发布', style: TextStyle(color: Colors.white)),
       ),
 
       body: _mainView(),
